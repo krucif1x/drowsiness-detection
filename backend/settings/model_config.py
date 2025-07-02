@@ -4,10 +4,6 @@ from pydantic import BaseModel
 
 
 class FaceMeshConfig(BaseModel):
-    eye_aspect_ratio_threshold: float
-    eye_aspect_ratio_consec_frames: int
-    mouth_aspect_ration_threshold: float
-    mouth_aspect_ration_consec_frames: int
     static_image_mode: bool
     refine_landmarks: bool
     max_number_face_detection: int

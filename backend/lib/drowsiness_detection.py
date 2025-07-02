@@ -49,7 +49,7 @@ class DrowsinessDetection():
 
         Parameters
         ----------
-        config : FaceMeshConfig
+        config : DrowsinessConfig
             Path to the configuration file containing threshold values for EAR, MAR, and etc.
 
         """
@@ -57,12 +57,36 @@ class DrowsinessDetection():
 
         self.ear_ratio = config.eye_aspect_ratio_threshold
         self.ear_consec_frames = config.eye_aspect_ratio_consec_frames
-        self.mouth_aspect_ratio_threshold = config.mouth_aspect_ration_threshold
-        self.mouth_aspect_ratio_consec_frames = config.mouth_aspect_ration_consec_frames
+        self.mouth_aspect_ratio_threshold = config.mouth_aspect_ratio_threshold
+        self.mouth_aspect_ratio_consec_frames = config.mouth_aspect_ratio_consec_frames
         self.apply_triangle_masking = config.apply_masking
 
         logging_default.info(
             f"Loaded config - EAR: {self.ear_ratio}, EAR Frames: {self.ear_consec_frames}, " \
+            f"MAR: {self.mouth_aspect_ratio_threshold}, MAR Frames: {self.mouth_aspect_ratio_consec_frames}"
+        )
+        return
+
+    def reinitialize_configuration(self, new_config : DrowsinessConfig) -> None:
+        """
+        Re-Load the detection settings from a Drowsiness Config Object to change the current value
+
+        Parameters
+        ----------
+        config : DrowsinessConfig
+            Path to the configuration file containing threshold values for EAR, MAR, and etc.
+
+        """
+        logging_default.info("Loading drowsiness detection configs and model configuration")
+
+        self.ear_ratio = new_config.eye_aspect_ratio_threshold
+        self.ear_consec_frames = new_config.eye_aspect_ratio_consec_frames
+        self.mouth_aspect_ratio_threshold = new_config.mouth_aspect_ratio_threshold
+        self.mouth_aspect_ratio_consec_frames = new_config.mouth_aspect_ratio_consec_frames
+        self.apply_triangle_masking = new_config.apply_masking
+
+        logging_default.info(
+            f"Loaded re-apply config - EAR: {self.ear_ratio}, EAR Frames: {self.ear_consec_frames}, " \
             f"MAR: {self.mouth_aspect_ratio_threshold}, MAR Frames: {self.mouth_aspect_ratio_consec_frames}"
         )
         return

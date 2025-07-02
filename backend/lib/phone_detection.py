@@ -37,6 +37,24 @@ class PhoneDetection():
             f"Loaded config - Distance Threshold: {self.distance_threshold}"
         )
 
+    def reinitialize_configuration(self, new_config : PhoneDetectionConfig) -> None:
+        """
+        Re-Load the detection settings from a Drowsiness Config Object to change the current value
+
+        Parameters
+        ----------
+        config : PhoneDetectionConfig
+            Path to the configuration file containing threshold values for EAR, MAR, and etc.
+
+        """
+        logging_default.info("Loading Phone detection configs and model configuration")
+        self.distance_threshold = new_config.distance_threshold
+
+        logging_default.info(
+            f"Loaded re-apply config - Distance Threshold: {self.distance_threshold}"
+        )
+        return
+
     def detect_body_pose(self, image : np.ndarray) -> list:
         """
         This function is to process an RGB image and
