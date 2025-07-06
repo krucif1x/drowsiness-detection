@@ -45,7 +45,7 @@ drowsiness_service = DrowsinessDetectionService(buzzer_service, socket_trigger, 
 phone_detection_service = PhoneDetectionService(socket_trigger)
 hand_service = HandsDetectionService(socket_trigger)
 
-detection_task = DetectionTask(settings.PipelineSettings)
+detection_task = DetectionTask()
 
 # Create shared frame buffer
 frame_buffer = FrameBuffer()
@@ -98,7 +98,7 @@ app.mount(f"/{settings.ApiSettings.static_dir}", StaticFiles(directory=f"{settin
 logging_default.info("Registering API routers")
 app.include_router(app_version.router, prefix="/version", tags=["Version"])
 app.include_router(buzzer_router.buzzer_router(buzzer_service), prefix="/buzzer", tags=["Buzzer"])
-app.include_router(config_router.config_router(drowsiness_service, phone_detection_service), prefix="/config", tags=["config"])
+app.include_router(config_router.config_router(drowsiness_service, phone_detection_service, detection_task), prefix="/config", tags=["config"])
 app.include_router(detection_control_router.detection_control_router(detection_background_service), prefix="/detection", tags=["Detection Control"])
 app.include_router(drowsiness_realtime_router.drowsiness_realtime_router(frame_buffer), prefix="/realtime", tags=["Realtime Drowsiness"])
 app.include_router(drowsiness_event_router.router, prefix="/drowsinessevent", tags=["Drowsiness Event"])

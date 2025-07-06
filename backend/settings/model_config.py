@@ -2,6 +2,7 @@ import json
 
 from pydantic import BaseModel
 
+MODEL_CONFIG_PATH = "config/model_settings.json"
 
 class FaceMeshConfig(BaseModel):
     static_image_mode: bool
@@ -28,7 +29,7 @@ class ModelConfig(BaseModel):
     hands: HandsConfig
 
     @classmethod
-    def load(cls, path: str = "config/model_settings.json"):
+    def load(cls, path: str = MODEL_CONFIG_PATH):
         with open(path) as f:
             data = json.load(f)
         return cls(**data)

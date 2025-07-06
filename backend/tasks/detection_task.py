@@ -8,7 +8,7 @@ from backend.hardware.camera.base_camera import BaseCamera
 from backend.services.drowsiness_detection_service import DrowsinessDetectionService
 from backend.services.hand_detection_service import HandsDetectionService
 from backend.services.phone_detection_service import PhoneDetectionService
-from backend.settings.app_config import PipelineSettings
+from backend.settings.app_config import settings
 from backend.utils.drawing_utils import (
     draw_fps,
     draw_timestamp,
@@ -18,16 +18,28 @@ from backend.utils.logging import logging_default
 
 
 class DetectionTask:
-    def __init__(self, pipeline_config : PipelineSettings):
-        self.load_configuration(pipeline_config)
+    def __init__(self):
+        self.load_configuration()
 
-    def load_configuration(self, config : PipelineSettings):
-        self.drowsiness_model_run = config.drowsiness_model_run
-        self.phone_detection_model_run = config.phone_detection_model_run
-        self.hands_detection_model_run = config.hands_detection_model_run
+    def load_configuration(self):
+        self.drowsiness_model_run = settings.PipelineSettings.drowsiness_model_run
+        self.phone_detection_model_run = settings.PipelineSettings.phone_detection_model_run
+        self.hands_detection_model_run = settings.PipelineSettings.hands_detection_model_run
 
         logging_default.info(
             "Loaded config - drowsiness_model_run: {drowsiness_model_run}, phone_detection_model_run: {phone_detection_model_run}, hands_detection_model_run: {hands_detection_model_run}",
+            drowsiness_model_run=self.drowsiness_model_run,
+            phone_detection_model_run=self.phone_detection_model_run,
+            hands_detection_model_run=self.hands_detection_model_run
+        )
+    
+    def reinitialize_configuration(self):
+        self.drowsiness_model_run = settings.PipelineSettings.drowsiness_model_run
+        self.phone_detection_model_run = settings.PipelineSettings.phone_detection_model_run
+        self.hands_detection_model_run = settings.PipelineSettings.hands_detection_model_run
+
+        logging_default.info(
+            "Re-Loaded config - drowsiness_model_run: {drowsiness_model_run}, phone_detection_model_run: {phone_detection_model_run}, hands_detection_model_run: {hands_detection_model_run}",
             drowsiness_model_run=self.drowsiness_model_run,
             phone_detection_model_run=self.phone_detection_model_run,
             hands_detection_model_run=self.hands_detection_model_run
@@ -172,3 +184,5 @@ class DetectionTask:
         except Exception as e:
             logging_default.warning(f"Failed to combine debug frames: {e}")
             return None
+        
+    

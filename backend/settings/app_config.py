@@ -2,6 +2,7 @@ import json
 
 from pydantic import BaseModel
 
+APP_CONFIG_PATH = "config/app_settings.json"
 
 class PipelineSettings(BaseModel):
     drowsiness_model_run: bool
@@ -26,7 +27,7 @@ class AppConfig(BaseModel):
     ApiSettings: ApiSettings
 
     @classmethod
-    def load(cls, path: str = "config/app_settings.json"):
+    def load(cls, path: str = APP_CONFIG_PATH):
         with open(path) as f:
             data = json.load(f)
         return cls(**data)

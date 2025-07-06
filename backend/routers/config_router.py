@@ -1,15 +1,24 @@
+import json
+
 from fastapi import APIRouter, HTTPException
 from pydantic import ValidationError
 
 from backend.domain.dto.base_response import StandardResponse
 from backend.services.drowsiness_detection_service import DrowsinessDetectionService
 from backend.services.phone_detection_service import PhoneDetectionService
+from backend.settings.app_config import (
+    APP_CONFIG_PATH,
+    PipelineSettings,
+    settings,
+)
 from backend.settings.detection_config import DetectionConfig, detection_settings
+from backend.tasks.detection_task import DetectionTask
 
 
 def config_router(
     drowsiness_service: DrowsinessDetectionService,
-    phone_detection_service: PhoneDetectionService
+    phone_detection_service: PhoneDetectionService,
+    detection_task : DetectionTask
 ):
     router = APIRouter()
 
@@ -28,7 +37,7 @@ def config_router(
             raise HTTPException(status_code=500, detail=f"Failed to fetch config: {str(e)}")
 
     @router.post(
-        "/detection",
+        "/detection/update",
         summary="Update detection settings",
         response_model=StandardResponse,
         description="""
@@ -63,4 +72,40 @@ def config_router(
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
+    @router.get("/pipeline", response_model=PipelineSettings)
+    async def get_app_config():
+        """Returns the entire config of App Settings."""
+        return settings.PipelineSettings
+    
+    @router.post("/pipeline/update",
+        summary="Update pipeline settings",
+        response_model=StandardResponse,
+        description="Updates and applies the pipeline configuration in runtime and file."
+    )
+    async def update_pipeline_settings(pipeline_data: PipelineSettings):
+        try:
+            # Update in-memory
+            settings.PipelineSettings = pipeline_data
+
+            # Save to JSON
+            with open(APP_CONFIG_PATH, "r+") as f:
+                data = json.load(f)
+                data["PipelineSettings"] = pipeline_data.model_dump()
+                f.seek(0)
+                json.dump(data, f, indent=2)
+                f.truncate()
+            
+            # Apply the service to immedietly get changes
+            detection_task.reinitialize_configuration()
+
+            return StandardResponse(
+                status="success",
+                message="Pipeline settings updated and applied",
+                data=True
+            )
+        except ValidationError as ve:
+            raise HTTPException(status_code=422, detail=ve.errors())
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
+        
     return router

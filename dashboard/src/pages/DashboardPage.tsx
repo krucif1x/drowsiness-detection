@@ -1,7 +1,7 @@
 import { Grid } from "@mui/material";
 import React from "react";
 import SystemConfiguration from "../components/DetectionConfiguration";
-import ModelConfiguration from "../components/ModelConfiguration";
+import ModelConfiguration from "../components/PipelineConfiguration";
 import LiveFeed from "../components/LiveFeed";
 import FacialMetricsChart from "../components/FacialMetricsLiveChart";
 import RecentDetectionEvent from "../components/RecentDetectionEvent";

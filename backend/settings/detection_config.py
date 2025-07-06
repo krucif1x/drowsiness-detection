@@ -2,6 +2,7 @@ import json
 
 from pydantic import BaseModel
 
+DETECTION_CONFIG_PATH = "config/detection_settings.json"
 
 class DrowsinessConfig(BaseModel):
     eye_aspect_ratio_threshold: float
@@ -18,12 +19,12 @@ class DetectionConfig(BaseModel):
     phone_detection: PhoneDetectionConfig
 
     @classmethod
-    def load(cls, path: str = "config/detection_settings.json"):
+    def load(cls, path: str = DETECTION_CONFIG_PATH):
         with open(path) as f:
             data = json.load(f)
         return cls(**data)
     
-    def save(self, path: str = "config/detection_settings.json"):
+    def save(self, path: str = DETECTION_CONFIG_PATH):
         with open(path, "w") as f:
             json.dump(self.model_dump(), f, indent=2)
     
