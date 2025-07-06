@@ -1,16 +1,20 @@
 import { Grid } from "@mui/material";
 import React from "react";
-import SystemConfiguration from "../components/SystemConfiguration";
-import ModelConfiguration from "../components/ModelConfiguration";
+import SystemConfiguration from "../components/DetectionConfiguration";
+import ModelConfiguration from "../components/PipelineConfiguration";
 import LiveFeed from "../components/LiveFeed";
 import FacialMetricsChart from "../components/FacialMetricsLiveChart";
 import RecentDetectionEvent from "../components/RecentDetectionEvent";
 import { API_URL_LOCATION } from "../constant/urlConstant";
+import SystemControl from "../components/SystemControl";
 
 const DashboardPage : React.FC = () => {
     return (
         <Grid container spacing={2} margin={2}>
             <Grid size={{ xs: 12, lg : 3 }}>
+                <Grid>
+                    <SystemControl/>
+                </Grid>
                 <Grid>
                     <SystemConfiguration/>
                 </Grid>
