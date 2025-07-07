@@ -1,4 +1,3 @@
-# src/hardware/abstract_camera.py
 from abc import ABC, abstractmethod
 
 import numpy as np
