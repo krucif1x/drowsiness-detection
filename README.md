@@ -23,20 +23,54 @@ For the computer vision manipulation, we are using your old friend OpenCV. Reall
 ### Backend
 At first, I want to expose the API using C# ASP .NET platform. But it seems that doing this will just make more work, that's why I decided used [FastAPI](https://fastapi.tiangolo.com/) where it was already in the same environment as the Model and Computer Vision libraries. But maybe some of you will ask who already familiar with Flask, why not Flask or any other stuff? Well it's not like I hate flask, but I was searching a framework that already have OpenAPI built into them and FastAPI already meet that requirements.
 
+### Frontend
+At first also, I want to create Vue to build the dashboard, but I just can make the Vue Component library to be working, as I'm suck at this. That's why I decided just going to use React. React is good, it's pretty lightwight and there are many component library out there that we can used, perfect for me to be used. Maybe, a lot of you may ask again? Why not use Flutter? Waste as there we are receiving bootcamp about Flutter and there are Flutter for website available. But I find out that, Flutter is not really optimized for website dashboard experience, and I plan to stream video data that can be quite big, that's why I choose React as it only update certain state compoenent that only need to be updated.
 
 ## Project Structure
-The app structure is as follows: the entry point of the app is `main.py`. The src folder contains the main application code, not really adhering to the Clean arhictecture, but more like following the more OOP Design to ensure the modularity and the shared-responsibilities that I want.
+The app structure is as follows: the entry point of the app is `main.py`. The `backend` folder contains the main application code, not really adhering to the Clean arhictecture, but more like following the more OOP Design to ensure the modularity and the shared-responsibilities that I want. While the code for the `frontend` is store in the `dashboard` folder to display an internal dashboard that can be accessed via local network to see the result of the detection.
 
 ```
 drowsiness-detection/
-├── src/
+├── alembic
+├── backend/
 │   ├── enum
 │   ├── services
+│   ├── hardware
 │   ├── ....
-├── test/
+├── config
+├── dashboard/
+│   ├── src
+├── hailo_model
+├── static
+├── activities.db
+├── alembic.ini
+├── main.py
+├── requirements.txt
 ```
 
-As this project is still under development, I can say that this structure can be contested for change to be more flexible, as I really don't have experience building in a Python environment, and I don't really find a good project in github that really adheres OOP in Python, this will do for now.
+As this project is still under development, I can say that this structure can be contested again for change to be more flexible in the future, as I really don't have experience building in a Python environment, and I don't really find a good project in github that really adheres OOP in Python and can be referenced, this will do for now.
+
+As for the explanation on the project structure
+- `alembic`:  
+This directory contains database migration scripts powered by Alembic. It helps in version-controlling the database schema and applying upgrades or rollbacks in a structured way.
+- `backend`:  
+This folder contains the core backend logic of the application. This such as like the routers, middleware connect to the hardware such as camera or other sensor using Python, services to connect to db, appyling migrations, etc
+- `config`:  
+This folder holds configuration-related files and modules. Currently it holds detection configs for the higher level calculation for decision making, model settings
+- `dashboard`:  
+This is the client frontend f the app.
+- `hailo_model`:  
+This folder includes files or artifacts related to the Hailo AI accelerator or pre-trained models, used for performing the actual drowsiness detection on edge devices. This also includes files for the config of the hailo model
+- `static`:  
+Contains static files used by the dashboard or backend, which is in this case to store the image where later will be used to be served if anyone need it
+- `activities.db`:  
+The local SQLite database used for storing user or detection activity logs. 
+- `alembic.ini`:  
+The Alembic configuration file that defines connection settings and logging for database migrations.
+- `main.py`:  
+The entry point of the application. It likely initializes the backend services, loads the model(s), starts the API or web server, and sets up routes for both internal usage and dashboard consumption.
+- `requirements.txt`:  
+The list of packages or libraries that needed to be installed on the project
 
 ## Installing Environment 
 To run this project, we will use a virtual environment to manage our project dependencies. I think that most easiest way to installing python packages in secluded environment is using the Python own official, virtual environment. To do this, first you must have to install python first. The app is using this spesification
@@ -173,7 +207,7 @@ alembic upgrade head
 
 in the code of `main.py`, I already add function to dynamically at the runtime on the startyp to apply migrations to the database if there's any changes. So what you can do is, if you want to add something to the databse, just make sure to do the migrations, then commit that, and then run them for your convinience. 
 
-## How to Run The App
+## How to Run The Backend
 The app is using FastAPI to control the data of the stream. And to run this, it's quite simple if you follow the setup up environment correctly. We will use uvicorn, An ASGI web server for Python. First, make sure you are in the virtual environment first, and after that simply type this on terminal on the root directory
 
 ```bash
@@ -190,9 +224,38 @@ The server will run and there will be logs like this one
 INFO:     Started server process [4060]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+2025-07-21 15:49:47.239 [INFO] main.<module>: Building services and initiated hardwares
+2025-07-21 15:49:47.240 [INFO] socket_trigger.load_configurations: Loading api configs and model configuration
+2025-07-21 15:49:47.240 [INFO] socket_trigger.load_configurations: Loaded config - Vehicle ID: 1HGCM82633A123456, Server: 203.100.57.59:3100, Device: jetson, Send to Server: True, WS URL: ws://203.100.57.59:3100?vehicle_id=1HGCM82633A123456&device=jetson
+2025-07-21 15:49:47.241 [INFO] cv_camera.__init__: Setting up the camera
+2025-07-21 15:49:52.733 [INFO] windows_buzzer.setup: Setting up Buzzer in Windows
+2025-07-21 15:49:52.733 [INFO] windows_buzzer.setup: Triggering the first beep.
 ```
 
 To see the API documentation, just go to the http://127.0.0.1:8000/docs
+
+## How to Run The Frontend
+The app is using React to see the realtime internal dashboard as for Engineer and a local showcase about the project. And to run this, it's quite simple, go to the dashboard folder and run the node server from there. More detailed for the frontend or how to install neccessary things to run frontend can be see [here](/dashboard/README.md).
+
+```bash
+cd dashboard
+npm run dev
+```
+
+The node server will run and there will be logs like this one
+```prolog
+> dashboard@0.0.0 dev
+> vite
+
+  VITE v6.3.5  ready in 261 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://ip-address:3000/
+  ➜  Network: http://ip-address:3000/
+  ➜  press h + enter to show help
+```
+
+To see the dashboard documentation, just go to the http://127.0.0.1:3000
 
 ## How to run the lints
 I hope you read this, to make sure that this project is clean, as really Python never enforce any typing rules whatsoever, I really want this code project to have the same rules as other, that's why lints are used. This project use [Ruff](https://docs.astral.sh/ruff/) for the linters, and it really easy to use them. The rules can be found in the `.ruff.toml`.
@@ -221,9 +284,7 @@ All of this can be found [here](https://docs.astral.sh/ruff/tutorial/), so feel 
 
 
 ## Authors
-1. Muhammad Juniarto 
-2. Batch 1 Members of CC Department
-
+1. Muhammad Juniarto
 
 ## Project Reference
 1. https://www.hackster.io/AlbertaBeef/accelerating-the-mediapipe-models-on-raspberry-pi-5-ai-kit-1698fe
