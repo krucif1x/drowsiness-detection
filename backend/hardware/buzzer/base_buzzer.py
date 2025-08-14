@@ -1,4 +1,3 @@
-# src/hardware/abstract_buzzer.py
 from abc import ABC, abstractmethod
 
 
