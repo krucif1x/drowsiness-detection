@@ -1,11 +1,28 @@
-# React + TypeScript + Vite
+# Drowsiness Detection React Dashboard
+This is folder for holding the code for the drowsiness detection project internal dashbord using React v19. The dashboard are getting the video stream of the data result from the Mediapipe calculation and other things such as using Realtime Facial Metrics and some event data
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Build
+To build the dashboard, run the following commands:
+```bash
+npm install
+npm run build
+```
+This will compile the React code and generate the production-ready files in the `dist/` directory
 
-Currently, two official plugins are available:
+## Run
+To run the development server locally:
+```bash
+npm install
+npm run dev
+```
+This will start the dashboard on http://localhost:3000 by default. You can access it through your browser to see the live feed and metrics.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+You can also run the output of the build directly by using a static file server. For example:
+```bash
+npx serve -s build
+```
+
+This will serve the contents of the dist/ folder on a local server (usually at http://localhost:3000), allowing you to preview the production build without deploying it.
 
 ## Expanding the ESLint configuration
 

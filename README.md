@@ -58,7 +58,7 @@ This folder contains the core backend logic of the application. This such as lik
 - `config`:  
 This folder holds configuration-related files and modules. Currently it holds detection configs for the higher level calculation for decision making, model settings
 - `dashboard`:  
-This is the client frontend f the app.
+This is the client frontend of the app.
 - `hailo_model`:  
 This folder includes files or artifacts related to the Hailo AI accelerator or pre-trained models, used for performing the actual drowsiness detection on edge devices. This also includes files for the config of the hailo model
 - `static`:  
