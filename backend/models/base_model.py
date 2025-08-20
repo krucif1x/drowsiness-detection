@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod #Helper class that you inherit from to make your class an Abstract Base Class
 
-import cv2
+import cv2 #Popular Tool for computer vision tasks
 
 
 class BaseModelInference(ABC):
@@ -9,12 +9,12 @@ class BaseModelInference(ABC):
     if one plan to make another class to encapsulated a model
     """
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__() #calls the constructor of the parent class (ABC)
 
     @abstractmethod
     def load_model(self, model_path :str):
         """
-        Load the machine learning or deep learning model according to the step of the model and their spesific configuration needed
+        Load the machine learning or deep learning model according to the step of the model and their specific configuration needed
         typically a saved model file (e.g., .h5, .pkl, .pth, etc.) or if using 3rd Party like load the library here
 
         Parameters
@@ -25,7 +25,7 @@ class BaseModelInference(ABC):
         pass
 
     @abstractmethod
-    def preprocess(self, image: cv2.Mat) -> cv2.Mat:
+    def preprocess(self, image: cv2.Mat) -> cv2.Mat: #Designed to take a raw image (image: cv2.Mat) and prepare it for the model (->cv2.Mat)
         """
         Custom preprocess function the input frame for inference if needed.
         
@@ -41,7 +41,7 @@ class BaseModelInference(ABC):
         pass
 
     @abstractmethod
-    def inference(self, image: cv2.Mat, preprocessed : bool = True):
+    def inference(self, image: cv2.Mat, preprocessed : bool = True): #Core predicition step where it takes an image and a boolean flag preprocessed
         """
         Performing inference of the model to detect landmarks (e.g., face, hand, pose) based on the provided model.
 
