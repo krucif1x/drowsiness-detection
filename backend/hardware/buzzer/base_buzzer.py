@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
-
+from abc import ABC, abstractmethod #ABC or Abstract Base CLass is a blueprint that dictates what methods any subclass must have
+#  If a developer creates a new buzzer class (e.g., RaspberryPiBuzzer) that inherits from BaseBuzzer but forgets to define one of these methods, Python will raise an error.
 
 class BaseBuzzer(ABC):
     @abstractmethod
