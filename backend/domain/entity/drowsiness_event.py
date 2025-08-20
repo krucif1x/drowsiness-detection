@@ -1,8 +1,8 @@
-from datetime import datetime
-from uuid import UUID
+from datetime import datetime #Library for dates and times, specifically for the timestamp field
+from uuid import UUID # An Universally Unique Identifier and used to make uniwue ID for each event record
 
-from sqlmodel import Column, Field, SQLModel, String
-from uuid6 import uuid7
+from sqlmodel import Column, Field, SQLModel, String # Core components from the sqlmodel library
+from uuid6 import uuid7 #This is a function from the uuid6 library that generates a special kind of UUID (Version 7)
 
 
 class DrowsinessEvent(SQLModel, table=True):
