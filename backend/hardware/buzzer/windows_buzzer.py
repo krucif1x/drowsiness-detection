@@ -1,11 +1,12 @@
-import winsound
-from time import sleep
+import winsound #Liibrary for Windows OS
+#It provides access to the basic sound-playing machinery of Windows, allowing you to play simple sounds like beeps.
+from time import sleep #Used to create pauses in program's execution
 
-from backend.hardware.buzzer.base_buzzer import BaseBuzzer
-from backend.utils.logging import logging_default
+from backend.hardware.buzzer.base_buzzer import BaseBuzzer #An import statement from a local project file that has ABC
+from backend.utils.logging import logging_default #a pre-configured logging object to print status messages to the console or a file
 
 
-class WindowsBuzzer(BaseBuzzer):
+class WindowsBuzzer(BaseBuzzer): # creates a new class named WindowsBuzzer. By inheriting from BaseBuzzer
     def __init__(self):
         self.setup()
 
@@ -16,11 +17,11 @@ class WindowsBuzzer(BaseBuzzer):
         logging_default.info("Triggering the first beep.")
 
         # Just gonna sound this to make sure everythings ok
-        winsound.Beep(2000, 200)
-        winsound.Beep(2000, 200)
+        winsound.Beep(2000, 200) #Beep function from the winsound library to generate two quick beeps
+        winsound.Beep(2000, 200) #First Argument is Frequency in Hertz (2000) and 2nd one is Duration in milliseconds (200)
     
 
-    def beep(self, times : int, duration : int, pause : int, frequency: int = 1000):
+    def beep(self, times : int, duration : int, pause : int, frequency: int = 1000): #core logic for making the buzzer beep. It accepts parameters for the number of beeps, duration, pause, and frequency. It provides a default frequency of 1000 Hz if none is specified.
         """
         Beeps the buzzer in a periodic way
 
@@ -41,7 +42,7 @@ class WindowsBuzzer(BaseBuzzer):
         pause : float
             Pause between each beeps, this will decide wether it is slow or fast temp. In second
         """
-        for _ in range(times):
+        for _ in range(times): #for loop
             winsound.Beep(frequency, duration)
             sleep(pause)
 
