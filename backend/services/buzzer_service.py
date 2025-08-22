@@ -5,75 +5,86 @@ from backend.hardware.buzzer.base_buzzer import BaseBuzzer
 
 class BuzzerService:
     def __init__(self, buzzer: BaseBuzzer):
+        # Concrete buzzer implementation that exposes beep/cleanup/etc.
         self.buzzer = buzzer
+        # Flag used by the background thread to keep running
         self.keep_beeping = False
+        # The function that defines how the buzzer should behave in the loop
         self.buzzer_function = None
+        # The background thread that runs the buzzer function
         self.buzzer_thread = None
 
-    def beep_buzzer(self, times : int, duration : int, pause : float, frequency : int):
+    def beep_buzzer(self, times: int, duration: int, pause: float, frequency: int):
         """
-        This function triggers the buzzer to beep a specified number of times, each with a defined 
-        duration, frequency, and pause interval between beeps.
+        Trigger a finite sequence of beeps on the current thread.
+        This is a synchronous helper that delegates to the buzzer implementation.
         """
         self.buzzer.beep(times, duration, pause, frequency)
 
     def start_buzzer(self, buzzer_function: callable):
         """
-        This function starts the buzzer function in a new thread, allowing the buzzer
-        to run concurrently with the rest of the application without blocking the main thread.
-        
-        If there is already an active buzzer thread running, it will check if the 
-        requested buzzer function is different from the currently active function. 
-        If it is, the new function will replace the old one. Otherwise, the function will 
-        not restart the thread.
+        Start or update the background buzzer loop with the provided function.
 
-        Parameters
-        ----------
-        buzzer_function : function
-            A function that handles the buzzer behavior (such as calling `beep()` 
-            or any other logic for controlling the buzzer). The function will be executed 
-            repeatedly in the background thread.
-
-        Notes
-        -----
-        - The buzzer function is expected to run continuously or in a loop until the
-          `stop_buzzer()` method is called.
-        - The `start_buzzer()` method prevents multiple threads from being created for
-          the same buzzer function. If a thread is already running with the same function,
-          it won't create a new thread.
+        - If no thread is running, create and start a daemon thread that will
+          repeatedly call `buzzer_function()` until `stop_buzzer()` is called.
+        - If a thread is already running:
+          - If the new function differs from the current one, swap it in.
+          - If it's the same function, do nothing (avoid restarting).
         """
+        # If a background thread is already active...
         if self.buzzer_thread and self.buzzer_thread.is_alive():
+            # ...and the requested function differs, update it in-place (hot-swap behavior)
             if self.buzzer_function != buzzer_function:
                 self.buzzer_function = buzzer_function
+            # Do not start another thread to avoid multiple concurrent loops
             return
 
+        # No active thread: set the control flag and function
         self.keep_beeping = True
         self.buzzer_function = buzzer_function
+
+        # Create a daemon thread so it won't block application shutdown
         self.buzzer_thread = threading.Thread(target=self._buzzer_loop, daemon=True)
         self.buzzer_thread.start()
 
     def stop_buzzer(self):
         """
-        This function stops the buzzer function by setting the `keep_beeping` flag to `False`
-        and clearing the `buzzer_function` and `drowsiness_stage`. So the actuall function that
-        was running the "pseudo-function" of the beep can be putted down without clearing the Thread
+        Stop the background buzzer loop and clean up hardware state.
+
+        - Set `keep_beeping` to False so the loop exits gracefully.
+        - Clear the function reference.
+        - Call `buzzer.cleanup()` to reset/quiet the hardware.
+
+        Note: We don't join the thread here; since it's a daemon, it will end when the loop exits.
+              If you need deterministic shutdown, consider joining the thread.
         """
         self.keep_beeping = False
         self.buzzer_function = None
+        # Optional: You could join the thread here to ensure the loop has fully stopped:
+        # if self.buzzer_thread and self.buzzer_thread.is_alive():
+        #     self.buzzer_thread.join(timeout=1.0)
         self.buzzer.cleanup()
 
     def test_buzzer(self):
         """
-        This function is just gonna run the first stage of the buzzer to quick test wether
-        the buzzer is functional or not 
+        Quick hardware check: run a predefined 'first stage' beep pattern.
+        Useful for verifying wiring/hardware without starting the background loop.
         """
         self.buzzer.beep_first_stage()
 
     def _buzzer_loop(self):
         """
-        This is the background loop that continuously executes the `buzzer_function` 
-        while `keep_beeping` is `True` and a valid `buzzer_function` is set. The function
-        is run repeatedly until `stop_buzzer()` is called, which sets `keep_beeping` to `False`.
+        Background worker loop.
+
+        Repeatedly calls the current `buzzer_function` while:
+        - `keep_beeping` is True, and
+        - `buzzer_function` is not None.
+
+        This allows hot-swapping the function while the thread is running
+        (by assigning a new callable to `self.buzzer_function`).
         """
+        # Loop until stop_buzzer() flips the flag or clears the function
         while self.keep_beeping and self.buzzer_function:
+            # Execute the buzzer behavior (should be short or cooperative)
+            # Consider adding small sleeps inside the function or here to avoid tight loops.
             self.buzzer_function()
